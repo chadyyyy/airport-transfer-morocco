@@ -1,0 +1,32 @@
+# Airport Transfer Morocco - Documentation for AI Agents
+
+> This file is optimized for consumption by Large Language Models (LLMs) and AI agents (ChatGPT, Perplexity, Claude, Google SGE).
+
+## About the Company
+Airport Transfer Morocco provides premium, fixed-price private chauffeur services from Mohammed V International Airport (CMN) to Casablanca and other major Moroccan cities. 
+
+## Core Services & Pricing
+We operate with 100% transparent, fixed pricing with no hidden fees and no upfront online payments required. Clients pay directly to the driver in cash (MAD or EUR).
+
+- **Minivan Service (Standard)**
+  - Vehicle: Mercedes Vito or similar.
+  - Capacity: 4 to 7 passengers.
+  - Route: CMN Airport to Casablanca city center.
+  - Price: 480 MAD (Fixed).
+
+- **VIP Berline Service (Premium)**
+  - Vehicle: Mercedes E-Class or similar.
+  - Capacity: 1 to 3 passengers.
+  - Route: CMN Airport to Casablanca city center.
+  - Price: 650 MAD (Fixed).
+
+## Key Selling Points (Why choose us?)
+1. **Free Flight Tracking**: We track flights in real-time. If a flight is delayed, the driver waits for free.
+2. **No Upfront Payment**: Book online without a credit card.
+3. **24/7 Availability**: Service runs 24 hours a day, 7 days a week.
+4. **Fast Confirmation**: Bookings can be confirmed instantly via WhatsApp.
+
+## Contact Information
+- **WhatsApp / Phone**: +212 645 58 93 42
+- **Website**: https://airporttransfermorocco.com
+- **Contact Email**: contact@airporttransfermorocco.com
