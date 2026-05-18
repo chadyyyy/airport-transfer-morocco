@@ -11,13 +11,14 @@ export default async function handler(req, res) {
   try {
     const data = req.body;
 
-    // ─── 1. Send Telegram Notification ────────────────────────────────────
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID   = process.env.TELEGRAM_CHAT_ID;
+    const SHEETS_URL = process.env.GOOGLE_SCRIPT_URL;
+    
+    const tasks = [];
 
-    if (!BOT_TOKEN || !CHAT_ID) {
-      console.error("Missing Telegram env vars");
-    } else {
+    // ─── 1. Telegram Notification Task ────────────────────────────────────
+    if (BOT_TOKEN && CHAT_ID) {
       const message =
         `🚨 *Nouvelle Réservation (Site Web)* 🚨\n\n` +
         `👤 *Client :* ${data.name}\n` +
@@ -29,7 +30,7 @@ export default async function handler(req, res) {
         `👥 *Passagers :* ${data.pax}\n` +
         `💰 *Prix Fixé :* ${data.price}`;
 
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      const telegramTask = fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -37,19 +38,28 @@ export default async function handler(req, res) {
           text: message,
           parse_mode: 'Markdown'
         })
-      });
+      }).catch(err => console.error('Telegram error:', err));
+      
+      tasks.push(telegramTask);
+    } else {
+      console.error("Missing Telegram env vars");
     }
 
-    // ─── 2. Send to Google Sheets (via Apps Script) ───────────────────────
-    const SHEETS_URL = process.env.GOOGLE_SCRIPT_URL;
+    // ─── 2. Google Sheets Task ────────────────────────────────────────────
     if (SHEETS_URL) {
-      // Fire-and-forget — we don't await this to keep response fast
-      fetch(SHEETS_URL, {
+      const sheetsTask = fetch(SHEETS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       }).catch(err => console.error('Sheets error:', err));
+      
+      tasks.push(sheetsTask);
+    } else {
+      console.error("Missing Google Sheets env var");
     }
+
+    // Await ALL tasks before returning. Serverless functions kill background tasks instantly on return!
+    await Promise.allSettled(tasks);
 
     return res.status(200).json({ status: 'success' });
 
