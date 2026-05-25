@@ -67,6 +67,9 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+    <!-- Preload LCP Image -->
+    <link rel="preload" as="image" href="hero-bg.jpg" fetchpriority="high">
+
     <!-- Styles and Scripts -->
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
@@ -129,45 +132,34 @@
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "4.9",
-    "reviewCount": "127",
+    "reviewCount": "128",
     "bestRating": "5",
     "worstRating": "1"
-  }
-}
-    </script>
-
-    <!-- Schema.org FAQPage for Perplexity & SGE -->
-    <script type="application/ld+json">
+  },
+  "review": [
     {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Combien coûte un transfert de l'aéroport de Casablanca au centre-ville ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Le prix est fixe : 45€ pour un Minivan (jusqu'à 7 personnes) et 59€ pour une Berline VIP (jusqu'à 3 personnes). Aucun frais caché."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Dois-je payer mon transfert aéroport à l'avance en ligne ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Non, aucune carte bancaire n'est requise. Vous payez directement en espèces (MAD ou EUR) à votre chauffeur à l'arrivée."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Que se passe-t-il si mon vol vers Casablanca est retardé ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Nous suivons votre vol en temps réel. Si votre vol est retardé, votre chauffeur vous attendra gratuitement sans frais supplémentaires."
-          }
-        }
-      ]
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Sophie L." },
+      "datePublished": "2026-03-15",
+      "reviewBody": "Service exceptionnel du début à la fin. Chauffeur très professionnel, véhicule impeccable, et un accueil soigné à la sortie des arrivées avec pancarte. Le prix fixe a été respecté à la lettre.",
+      "reviewRating": { "@type": "Rating", "ratingValue": "5" }
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Antoine D." },
+      "datePublished": "2026-01-22",
+      "reviewBody": "Réservation super facile via WhatsApp. Le chauffeur était là à l'heure malgré le retard de notre vol. Trajet très confortable pour aller jusqu'à notre hôtel à Casablanca. Je recommande fortement.",
+      "reviewRating": { "@type": "Rating", "ratingValue": "5" }
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Camille R." },
+      "datePublished": "2026-02-10",
+      "reviewBody": "Nous étions un groupe de 6 personnes avec beaucoup de valises. Le minivan était très spacieux, climatisé et propre. Paiement en espèces très pratique. Parfait de A à Z.",
+      "reviewRating": { "@type": "Rating", "ratingValue": "5" }
     }
+  ]
+}
     </script>
 
     <!-- Schema.org Service -->
