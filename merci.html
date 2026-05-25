@@ -257,8 +257,8 @@
             <div class="success-icon-large">
                 <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
-            <h1 class="success-title">Demande de réservation reçue</h1>
-            <p class="success-subtitle">Votre transfert a été pré-enregistré avec succès.</p>
+            <h1 class="success-title">Ouverture de WhatsApp...</h1>
+            <p class="success-subtitle">Votre conversation WhatsApp s'ouvre automatiquement.<br>Si rien ne se passe, utilisez le bouton ci-dessous.</p>
         </div>
 
         <div class="content-grid">
@@ -277,7 +277,7 @@
                 </ul>
                 <div class="summary-total">
                     <span>Prix Fixe</span>
-                    <span id="summary-price">... MAD</span>
+                    <span id="summary-price">...</span>
                 </div>
             </div>
 
@@ -337,37 +337,36 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Populate Order Summary
+            const waUrl = sessionStorage.getItem('pendingWhatsAppReservation')
+                       || 'https://wa.me/212645589342';
+
+            // ── Auto-open WhatsApp immediately ────────────────────────────
+            window.open(waUrl, '_blank');
+
+            // ── Update WhatsApp button href ───────────────────────────────
+            const waBtn = document.getElementById('final-whatsapp-btn');
+            if (waBtn) waBtn.href = waUrl;
+
+            // ── Populate Order Summary if data exists ─────────────────────
             const rawSummary = sessionStorage.getItem('bookingSummary');
             if (rawSummary) {
                 try {
                     const summary = JSON.parse(rawSummary);
-                    
-                    // Format date to French
                     let dateStr = summary.date;
-                    if(summary.date) {
+                    if (summary.date) {
                         const dateObj = new Date(summary.date);
                         if (!isNaN(dateObj)) {
                             dateStr = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                            // Capitalize first letter
                             dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
                         }
                     }
-
-                    document.getElementById('summary-direction').textContent = summary.direction || 'Transfert privé';
-                    document.getElementById('summary-date').textContent = dateStr || '-';
-                    document.getElementById('summary-time').textContent = summary.time || '-';
-                    document.getElementById('summary-hotel').textContent = summary.hotel || '-';
-                    document.getElementById('summary-price').textContent = summary.price ? summary.price + ' MAD' : '-';
-                } catch(e) {
-                    console.error("Error parsing booking summary", e);
-                }
-            }
-
-            // Populate WhatsApp Button
-            const waUrl = sessionStorage.getItem('pendingWhatsAppReservation');
-            if (waUrl) {
-                document.getElementById('final-whatsapp-btn').href = waUrl;
+                    const dir = document.getElementById('summary-direction');
+                    const dat = document.getElementById('summary-date');
+                    const prc = document.getElementById('summary-price');
+                    if (dir) dir.textContent = summary.direction || 'Transfert privé';
+                    if (dat) dat.textContent = dateStr || '-';
+                    if (prc) prc.textContent = summary.price ? summary.price + '€' : '-';
+                } catch(e) {}
             }
         });
     </script>

@@ -125,10 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
 
     if (reservationForm) {
-        reservationForm.addEventListener('submit', async (e) => {
+        reservationForm.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            // ── Validate required fields (simplified 3-field form) ────────
+            // ── Validate required fields ──────────────────────────────────
             const requiredFields = [
                 { id: 'form-phone',      label: 'Numéro WhatsApp' },
                 { id: 'form-date',       label: 'Date' },
@@ -146,24 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const submitBtn = reservationForm.querySelector('button[type="submit"]');
-
-            // Inject spin animation
-            if (!document.getElementById('spin-style')) {
-                const style = document.createElement('style');
-                style.id = 'spin-style';
-                style.innerHTML = '@keyframes spin { 100% { transform: rotate(360deg); } }';
-                document.head.appendChild(style);
-            }
-
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.innerHTML = `<span style="font-size:1.15rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:0.5rem;"><svg style="animation:spin 1s linear infinite;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg> Envoi en cours...</span>`;
-            submitBtn.disabled = true;
-
-            // ── Gather simplified form data ───────────────────────────────
+            // ── Gather form data ──────────────────────────────────────────
             const paxSelectEl = document.getElementById('form-pax-select');
             const paxValue    = paxSelectEl ? paxSelectEl.value : document.getElementById('form-pax').value;
-            // Map pax select to calculator buckets
             const paxBucket   = (parseInt(paxValue) >= 4 || paxValue === '5-7') ? '4-7' : '1-3';
             const dirValue    = document.getElementById('form-direction').value;
 
@@ -175,35 +160,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 price:     calculatePrice(dirValue, paxBucket) + '€'
             };
 
-            // ── Build WhatsApp URL & save to sessionStorage ───────────────
+            // ── Build WhatsApp URL & open directly ────────────────────────
             const waMessage   = buildWhatsAppMessage(formData);
             const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`;
-            sessionStorage.setItem('pendingWhatsAppReservation', whatsappUrl);
-            sessionStorage.setItem('bookingSummary', JSON.stringify({
-                direction: formData.direction,
-                date:      formData.date,
-                price:     calculatePrice(dirValue, paxBucket)
-            }));
 
-            // ── Send notification (with 4s safety timeout) ────────────────
-            const notifyRequest = fetch('/api/notify', {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify(formData)
-            }).catch(err => console.error('Notify error:', err));
+            window.open(whatsappUrl, '_blank');
 
-            const minWait = new Promise(resolve => setTimeout(resolve, 1500));
-            const maxWait = new Promise(resolve => setTimeout(resolve, 4000));
+            // ── Show inline success state on button ───────────────────────
+            const submitBtn = reservationForm.querySelector('button[type="submit"]');
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = `
+                <span style="font-size:1.1rem; font-weight:700; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    WhatsApp ouvert — continuez la conversation
+                </span>
+                <span style="font-size:0.8rem; opacity:0.85; margin-top:0.25rem;">Vous ne voyez pas la fenêtre ? <a id="wa-fallback-link" style="color:inherit; text-decoration:underline;" target="_blank" rel="noopener">Cliquez ici</a></span>`;
+            submitBtn.style.background = '#1DA851';
+            submitBtn.disabled = false;
 
-            await Promise.race([
-                Promise.all([minWait, notifyRequest]),
-                maxWait
-            ]);
+            // Set fallback link href
+            const fallbackLink = document.getElementById('wa-fallback-link');
+            if (fallbackLink) fallbackLink.href = whatsappUrl;
 
-            // ── Redirect to thank-you page ────────────────────────────────
-            window.location.href = 'merci.html';
+            // Reset button after 8 seconds
+            setTimeout(() => {
+                submitBtn.innerHTML = originalHTML;
+                submitBtn.style.background = '';
+            }, 8000);
         });
     }
+
 
     // ==========================================================================
     // 5. UI INTERACTIONS
