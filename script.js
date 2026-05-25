@@ -53,20 +53,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. PRICE CALCULATOR & TWO-PHASE SYNC
     // ==========================================================================
     function calculatePrice(direction, pax) {
-        // Minivan (4-7) is Standard: 480 MAD
-        // Berline VIP (1-3) is Premium: 650 MAD
-        let basePrice = (pax === '4-7') ? 480 : 650;
+        // EUR prices (1 EUR ≈ 11 MAD)
+        // Minivan (4-7): 45€ | Berline (1-3): 59€
+        // Aller-retour Minivan: 77€ | Aller-retour Berline: 105€
         if (direction === 'Aller-retour') {
-            basePrice = Math.round((basePrice * 1.8) / 10) * 10;
+            return (pax === '4-7') ? 77 : 105;
         }
-        return basePrice;
+        return (pax === '4-7') ? 45 : 59;
     }
 
     function updatePrices() {
         const direction = heroDirection.value;
         const pax = heroPax.value;
         const price = calculatePrice(direction, pax);
-        const formattedPrice = price + ' MAD';
+        const formattedPrice = price + '€';
 
         // Update Hero
         heroPrice.textContent = formattedPrice;
@@ -76,17 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
         formPax.value = pax;
         formDirectionDisplay.textContent = direction;
         formPriceDisplay.textContent = formattedPrice;
-        
-        // Dynamic Label for Hotel/Address
-        const hotelLabel = document.querySelector('label[for="form-hotel"]');
-        if (hotelLabel) {
-            const iconSvg = '<svg class="icon" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/><path d="M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/></svg> ';
-            if (direction === 'Hôtel → Aéroport') {
-                hotelLabel.innerHTML = iconSvg + 'Lieu de prise en charge (Hôtel)';
-            } else {
-                hotelLabel.innerHTML = iconSvg + 'Destination (Hôtel ou Adresse)';
-            }
-        }
         
         // Update Sticky Mobile CTA
         if (stickyPriceValue) stickyPriceValue.textContent = formattedPrice;
@@ -120,18 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildWhatsAppMessage(data) {
         let msg = `Bonjour Airport Transfer Morocco 👋\n\n`;
         msg += `Je souhaite réserver un transfert :\n\n`;
-        msg += `🚗 Type : ${data.direction}\n`;
+        msg += `🚗 Trajet : ${data.direction}\n`;
         msg += `👥 Passagers : ${data.pax}\n`;
         msg += `📅 Date : ${data.date}\n`;
-        msg += `🕐 Heure du vol : ${data.time}\n`;
-        if (data.flight) msg += `✈️ Numéro de vol : ${data.flight}\n`;
-        msg += `🏨 Destination : ${data.hotel}\n\n`;
-        msg += `👤 Nom : ${data.name}\n`;
-        msg += `📱 Téléphone : ${data.phone}\n`;
-        if (data.notes) msg += `\n💬 Remarques : ${data.notes}\n`;
-        
-        msg += `\nPrix estimé : ${calculatePrice(data.direction, data.pax)} MAD\n`;
-        msg += `Merci de confirmer ma réservation.`;
+        msg += `📱 WhatsApp : ${data.phone}\n`;
+        msg += `\n💶 Prix estimé : ${calculatePrice(data.direction, data.pax)}€\n`;
+        msg += `Merci de confirmer ma disponibilité.`;
         
         return encodeURIComponent(msg);
     }
@@ -145,15 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
         reservationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // ── Validate required fields ─────────────────────────────────
+            // ── Validate required fields (simplified 3-field form) ────────
             const requiredFields = [
-                { id: 'form-direction', label: 'Trajet' },
-                { id: 'form-pax',       label: 'Nombre de passagers' },
-                { id: 'form-date',      label: 'Date' },
-                { id: 'form-time',      label: 'Heure' },
-                { id: 'form-hotel',     label: 'Destination' },
-                { id: 'form-name',      label: 'Nom' },
-                { id: 'form-phone',     label: 'Téléphone' }
+                { id: 'form-phone',      label: 'Numéro WhatsApp' },
+                { id: 'form-date',       label: 'Date' },
+                { id: 'form-pax-select', label: 'Nombre de passagers' }
             ];
 
             for (const field of requiredFields) {
@@ -167,12 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const gdprChecked = document.getElementById('form-gdpr').checked;
-            if (!gdprChecked) {
-                alert("Veuillez accepter la politique de confidentialité.");
-                return;
-            }
-
             const submitBtn = reservationForm.querySelector('button[type="submit"]');
 
             // Inject spin animation
@@ -184,36 +157,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const originalBtnText = submitBtn.innerHTML;
-            submitBtn.innerHTML = `<span style="font-size:1.15rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:0.5rem;"><svg style="animation:spin 1s linear infinite;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg> Sécurisation en cours...</span>`;
+            submitBtn.innerHTML = `<span style="font-size:1.15rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:0.5rem;"><svg style="animation:spin 1s linear infinite;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg> Envoi en cours...</span>`;
             submitBtn.disabled = true;
 
-            // ── Gather form data ─────────────────────────────────────────
+            // ── Gather simplified form data ───────────────────────────────
+            const paxSelectEl = document.getElementById('form-pax-select');
+            const paxValue    = paxSelectEl ? paxSelectEl.value : document.getElementById('form-pax').value;
+            // Map pax select to calculator buckets
+            const paxBucket   = (parseInt(paxValue) >= 4 || paxValue === '5-7') ? '4-7' : '1-3';
+            const dirValue    = document.getElementById('form-direction').value;
+
             const formData = {
-                direction: document.getElementById('form-direction').value,
-                pax:       document.getElementById('form-pax').value,
+                direction: dirValue,
+                pax:       paxValue,
                 date:      document.getElementById('form-date').value,
-                time:      document.getElementById('form-time').value,
-                hotel:     document.getElementById('form-hotel').value,
-                name:      document.getElementById('form-name').value,
                 phone:     document.getElementById('form-phone').value,
-                flight:    document.getElementById('form-flight') ? document.getElementById('form-flight').value : '',
-                notes:     document.getElementById('form-notes')  ? document.getElementById('form-notes').value  : '',
-                price:     calculatePrice(
-                               document.getElementById('form-direction').value,
-                               document.getElementById('form-pax').value
-                           ) + ' MAD'
+                price:     calculatePrice(dirValue, paxBucket) + '€'
             };
 
             // ── Build WhatsApp URL & save to sessionStorage ───────────────
-            const waMessage  = buildWhatsAppMessage(formData);
+            const waMessage   = buildWhatsAppMessage(formData);
             const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`;
             sessionStorage.setItem('pendingWhatsAppReservation', whatsappUrl);
             sessionStorage.setItem('bookingSummary', JSON.stringify({
                 direction: formData.direction,
                 date:      formData.date,
-                time:      formData.time,
-                hotel:     formData.hotel,
-                price:     calculatePrice(formData.direction, formData.pax)
+                price:     calculatePrice(dirValue, paxBucket)
             }));
 
             // ── Send notification (with 4s safety timeout) ────────────────
@@ -223,16 +192,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 body:    JSON.stringify(formData)
             }).catch(err => console.error('Notify error:', err));
 
-            // Labor illusion: minimum 1.5s + max 4s total wait
-            const minWait   = new Promise(resolve => setTimeout(resolve, 1500));
-            const maxWait   = new Promise(resolve => setTimeout(resolve, 4000));
+            const minWait = new Promise(resolve => setTimeout(resolve, 1500));
+            const maxWait = new Promise(resolve => setTimeout(resolve, 4000));
 
             await Promise.race([
                 Promise.all([minWait, notifyRequest]),
-                maxWait  // Always redirect after 4s even if API is slow
+                maxWait
             ]);
 
-            // ── Always redirect to thank-you page ────────────────────────
+            // ── Redirect to thank-you page ────────────────────────────────
             window.location.href = 'merci.html';
         });
     }
