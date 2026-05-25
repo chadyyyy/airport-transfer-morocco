@@ -1534,3 +1534,21 @@ input.error, select.error {
     25%       { transform: translateX(-6px); }
     75%       { transform: translateX(6px); }
 }
+
+/* ========== WHATSAPP HERO BUTTON — mobile fix ========== */
+.btn-whatsapp-hero {
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    .btn-whatsapp-hero {
+        font-size: 0.9rem !important;
+        padding: 0.8rem 0.75rem !important;
+        gap: 0.4rem !important;
+    }
+    .btn-whatsapp-hero svg {
+        width: 18px !important;
+        height: 18px !important;
+        flex-shrink: 0;
+    }
+}
